@@ -26,7 +26,8 @@ class ParseCrawler(object):
             response,
             source_domain,
             original_url,
-            rss_title=None
+            ignore_regex=None,
+            rss_title=None,
     ):
         """
         Responsible for passing a NewscrawlerItem to the pipeline if the
@@ -38,9 +39,10 @@ class ParseCrawler(object):
         :param str rss_title: the title extracted by an rssCrawler
         :return NewscrawlerItem: NewscrawlerItem to pass to the pipeline
         """
-        if self.helper.heuristics.is_article(response, original_url):
-            return self.pass_to_pipeline(
-                response, source_domain, rss_title=None)
+        if not ignore_regex or not re.search(ignore_regex, response.url):
+            if self.helper.heuristics.is_article(response, original_url):
+                return self.pass_to_pipeline(
+                    response, source_domain, rss_title=None)
 
     def pass_to_pipeline(
             self,

@@ -22,6 +22,7 @@ class SitemapCrawler(scrapy.spiders.SitemapSpider):
         self.config = config
         self.helper = helper
         self.original_url = url
+        self.ignore_regex = config.section('Crawler')['ignore_regex']
 
         self.allowed_domains = [self.helper.url_extractor
                                     .get_allowed_domain(url, config.section(
@@ -44,7 +45,7 @@ class SitemapCrawler(scrapy.spiders.SitemapSpider):
             return
 
         yield self.helper.parse_crawler.pass_to_pipeline_if_article(
-            response, self.allowed_domains[0], self.original_url)
+            response, self.allowed_domains[0], self.original_url, self.ignore_regex)
 
     @staticmethod
     def only_extracts_articles():
