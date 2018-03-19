@@ -1,7 +1,7 @@
 import copy
 import threading
 
-from six.moves import urllib
+import requests
 
 
 class SimpleCrawler(object):
@@ -24,9 +24,9 @@ class SimpleCrawler(object):
         :param is_threaded: If True, results will be stored for later processing by the fetch_urls method. Else not.
         :return: html of the url
         """
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        req = urllib.request.Request(url, None, headers)
-        html = urllib.request.urlopen(req).read()
+        req = requests.get(url)
+        req.encoding = 'utf-8'
+        html = req.text
 
         if is_threaded:
             SimpleCrawler._results[url] = html
