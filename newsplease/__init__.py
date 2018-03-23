@@ -71,23 +71,26 @@ class NewsPlease:
         return final_article
 
     @staticmethod
-    def from_url(url):
+    def from_url(url, return_html=False):
         """
         Crawls the article from the url and extracts relevant information.
         :param url:
-        :return: A dict containing all the information of the article. Else, None.
+        :param return_html: True if users want to collect the extracted HTML content too
+        :return: A dict containing all the information of the article and the 
+            extracted HTML (if `return_html` is True). Else, None.
         """
-        articles = NewsPlease.from_urls([url])
+        articles = NewsPlease.from_urls([url], return_html=return_html)
         if url in articles.keys():
             return articles[url]
         else:
             return None
 
     @staticmethod
-    def from_urls(urls):
+    def from_urls(urls, return_html=False):
         """
         Crawls articles from the urls and extracts relevant information.
         :param urls:
+        :param return_html: True if users want to collect the extracted HTML content too
         :return: A dict containing given URLs as keys, and extracted information as corresponding values.
         """
         results = {}
@@ -95,14 +98,16 @@ class NewsPlease:
 
         if len(urls) == 0:
             pass
-        elif len(urls) == 1:
-            url = urls[0]
-            html = SimpleCrawler.fetch_url(url)
-            results[url] = NewsPlease.from_html(html, url, download_date)
         else:
             results = SimpleCrawler.fetch_urls(urls)
             for url in results:
-                results[url] = NewsPlease.from_html(results[url], url, download_date)
+                download_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                html = SimpleCrawler.fetch_url(url)
+                dict_article = NewsPlease.from_html(html, url, download_date)
+                if return_html:
+                    results[url] = (dict_article, html)
+                else:
+                    results[url] = dict_article
 
         return results
 
